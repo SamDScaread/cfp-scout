@@ -1,0 +1,24 @@
+# Runs live probes against WikiCFP and ICORE every day.
+# A failed run means a site changed and a tool would break. GitHub emails the repo owner.
+name: site health
+
+on:
+  schedule:
+    - cron: "23 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Probe live sites (free, uses Fetch only)
+        env:
+          TINYFISH_API_KEY: ${{ secrets.TINYFISH_API_KEY }}
+        run: |
+          if [ -z "$TINYFISH_API_KEY" ]; then
+            echo "::notice::Add a TINYFISH_API_KEY repository secret to enable this check."
+            exit 0
+          fi
+          uv run --python 3.12 cfp-scout-health
