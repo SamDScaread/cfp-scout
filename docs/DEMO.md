@@ -1,15 +1,14 @@
 # Demo script
 
-Record one real conversation in Claude Code or Claude Desktop, using these prompts in order. Show the tool calls on screen. Do not show your API key or your config file.
+Record one real conversation in Claude Desktop or Claude Code, using these prompts in order. Show the tool calls on screen. Do not show your API key or your config file.
 
 1. "Which robotics conferences have paper deadlines in the next 30 days? Show the name, deadline and location."
-2. "Check the ICORE ranks of the three you think are most relevant, and also ICRA for comparison."
-3. "Confirm the real deadline for ICRAI 2026 on its official website, and show me where you found it."
-4. "Now confirm the ICRA 2027 paper deadline. Was it extended?"
-5. "Watch the NOMS 2027 call for papers page so I hear about an extension, then check it and stop the watch."
-6. "Run a health check."
+2. "Look up the ICORE rank of the five most relevant ones, and of ICRA for comparison."
+3. "For the most promising one, confirm the paper deadline on its official website and show me where you found it."
+4. "Watch that page so I hear if the deadline is extended. Check it once now, then stop the watch."
+5. "Run a health check."
 
-Expected tools: `search_calls`, `get_venue_rank`, `verify_deadline`, `watch_deadline`, `check_watch`, `stop_watch`, `health_check`. Prompts 3 and 4 spend about $0.18 to $0.21 each from your TinyFish wallet, and prompt 5 about $0.01, so a full take costs about $0.40. Retakes within six hours reuse the cached answer only if the server stays running.
+Expected tools: `search_calls`, `get_venue_rank`, `verify_deadline`, `watch_deadline`, `check_watch`, `stop_watch`, `health_check`. Prompt 3 spends about $0.06 to $0.21 from your TinyFish wallet and prompt 4 about $0.01. The other prompts are free. If a take goes wrong, retry in the same conversation without restarting the client: a repeat `verify_deadline` for the same site within six hours reuses the cached answer at no cost.
 
 To show a loud failure, run the layout-change tests:
 
