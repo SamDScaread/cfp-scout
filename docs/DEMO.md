@@ -1,8 +1,8 @@
 # Demo script
 
-Record one real conversation in Claude Desktop or Claude Code, using these prompts in order. Show the tool calls on screen. Do not show your API key or your config file.
+Record one real conversation in Claude Desktop or Claude Code, using these prompts in order. Use a fresh chat with memory and custom instructions turned off, so the conversation shows only the tools. Show the tool calls on screen. Do not show your API key, your config file or your chat history.
 
-1. "Which robotics conferences have paper deadlines in the next 30 days? Show the name, deadline and location."
+1. "Use CFP Scout to find robotics conferences with paper deadlines in the next 30 days. Show the name, deadline and location."
 2. "Look up the ICORE rank of the five most relevant ones, and of ICRA for comparison."
 3. "For the most promising one, confirm the paper deadline on its official website and show me where you found it."
 4. "Watch that page so I hear if the deadline is extended. Check it once now, then stop the watch."

@@ -110,7 +110,7 @@ Three things catch this:
 
 ## Limits
 
-- **WikiCFP coverage:** it mostly covers computing and engineering, is community-edited, and lists many small venues first. Search for a known conference by name.
+- **WikiCFP coverage:** it mostly covers computing and engineering, is community-edited, and lists many small venues first. Some major venues are missing: RSS 2027 was not listed in November 2026. For those, call `verify_deadline` with `official_url` directly.
 - **ICORE coverage:** it ranks computing venues only. An unlisted venue is not necessarily a poor one, and this tool does not judge whether a conference is predatory.
 - **Speed:** WikiCFP pages take about 5 seconds each, because this server honours its crawl limit.
 - **Deadlines:** `verify_deadline` covers the main paper track. Use `date_lines` from `get_call` for other tracks, and check `evidence_url` before relying on a date.
