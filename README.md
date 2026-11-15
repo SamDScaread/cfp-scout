@@ -4,7 +4,7 @@
 
 Built on [TinyFish](https://www.tinyfish.ai) for the Site to MCP bounty.
 
-> Demo: *add your recording link here before submitting*
+> Demo: [7-minute recording of a real Claude Desktop conversation](https://lnkd.in/p/g6wjXE8T) (LinkedIn post with video)
 
 Ask your agent things like:
 
