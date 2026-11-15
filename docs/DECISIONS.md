@@ -4,7 +4,7 @@
 
 **Listings are treated as unverified.** WikiCFP is community-edited, and a listing has one deadline field even when a conference has several tracks. So `get_call` also returns `date_lines`, and only `verify_deadline` can confirm a date.
 
-**Agent answers are checked, not trusted.** In five real test runs, the main deadline was right every time, but other fields were not: the Agent returned the string `"null"`, cited a generic submission site, gave a page limit that could not be confirmed on the page it cited, reported an abstract deadline the page did not state, and paraphrased when asked for a verbatim quote. So Fetch re-reads the cited page, the date must appear there, and unreliable fields such as page limits were removed.
+**Agent answers are checked, not trusted.** In five real test runs, the main deadline was right every time, but other fields were not: the Agent returned the string `"null"`, cited a generic submission site, gave a page limit that could not be confirmed on the page it cited, reported an abstract deadline the page did not state, and paraphrased when asked for a verbatim quote. So Fetch re-reads the cited page, the date must appear there, and unreliable fields such as page limits were removed. A notification date must also appear next to a notification or acceptance label: during the demo recording the Agent reported a workshop's paper deadline as its notification date, and that date was on the page, but as a deadline.
 
 **Evidence is read from the full page body.** Cleaned markdown dropped a sidebar holding the ICRAI 2026 dates, which would have marked a correct answer as unverified.
 

@@ -91,6 +91,26 @@ def _null_if_empty(value: Any) -> str | None:
     return None if cleaned.lower() in {"", "null", "none", "n/a", "not stated"} else cleaned
 
 
+_NOTIFICATION_LABELS = ("notif", "acceptance", "decision")
+
+
+def _date_near_label(page_text: str, value: date, labels: tuple[str, ...], window: int = 150) -> bool:
+    """True if the date appears shortly after one of the labels on the page.
+
+    Finding the date anywhere on the page is not enough: for a Humanoids 2026 workshop the Agent
+    reported the paper deadline as the notification date, and that date was on the page as a deadline.
+    """
+    if not page_text:
+        return False
+    spellings = [_normalize(item) for item in date_spellings(value)]
+    for label in labels:
+        for match in re.finditer(re.escape(label), page_text):
+            nearby = page_text[match.start() : match.start() + window]
+            if any(item in nearby for item in spellings):
+                return True
+    return False
+
+
 def _timezone_on_page(text: str | None, page_text: str) -> str | None:
     """Keep a timezone only if the page states it. The Agent inferred one for ICRAI 2026 from its venue."""
     if not text or not page_text:
@@ -387,9 +407,8 @@ class CfpScout:
 
         notification: str | None = None
         parsed_notification = parse_date(notification_text)
-        if parsed_notification and page_text:
-            if any(_normalize(item) in page_text for item in date_spellings(parsed_notification)):
-                notification = iso(parsed_notification)
+        if parsed_notification and _date_near_label(page_text, parsed_notification, _NOTIFICATION_LABELS):
+            notification = iso(parsed_notification)
 
         reported_extended = answer.get("deadline_was_extended")
         page_mentions_extension = "extend" in page_text

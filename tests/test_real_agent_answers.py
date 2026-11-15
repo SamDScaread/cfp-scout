@@ -78,3 +78,28 @@ async def test_server_starts_over_stdio_and_lists_tools(monkeypatch, tmp_path):
     async with Client(params) as client:
         tools = (await client.list_tools()).tools
     assert len(tools) == 8
+
+
+async def test_humanoids_deadline_reported_as_notification_is_dropped(scout, gateway):
+    """Captured 2026-11-15 during the demo recording: the Agent gave the paper deadline as the
+    notification date. That date is on the page, but as a deadline, so it must not be returned."""
+    gateway.pages["humanoid-safety-assurance"] = load("evidence_humanoids.md")
+    gateway.agent_answer = {
+        "conference_name": "Humanoid Safety & Assurance 2026",
+        "deadline_quote": "Submission deadline (Paper & Demo): November 15, 2026 23:59 AoE (Extended)",
+        "deadline_was_extended": True,
+        "evidence_url": "https://humanoid-safety-assurance.paiagent.ai/humanoids2026/#important-dates",
+        "main_paper_deadline": "November 15, 2026 23:59 AoE (Extended)",
+        "notification_date": "November 15, 2026",
+        "timezone": "AoE",
+    }
+    gateway.agent_steps = 5
+    result = await scout.verify_deadline(
+        official_url="https://humanoid-safety-assurance.paiagent.ai/humanoids2026/",
+        conference_name="Humanoids 2026 workshop",
+    )
+    assert (result.status, result.verification_method) == ("verified", "quote_match")
+    assert result.deadline == "2026-11-15"
+    assert result.notification_date is None
+    assert result.timezone == "AoE"
+    assert result.was_extended is True
