@@ -3,7 +3,7 @@ import json
 import httpx
 import pytest
 
-from cfp_scout.errors import AgentRunError, MissingApiKeyError, PageFetchError, TinyFishApiError
+from cfp_scout.errors import AgentRunError, MalformedApiKeyError, MissingApiKeyError, PageFetchError, TinyFishApiError
 from cfp_scout.gateway import TinyFishGateway
 
 KEY = "test-key-should-never-leak"
@@ -49,6 +49,27 @@ async def test_missing_key_raises_before_any_request(monkeypatch):
     with pytest.raises(MissingApiKeyError):
         await gateway_with(handler, key=None).fetch_page("http://x.test")
     assert called == []
+
+
+async def test_key_from_a_windows_pipe_is_cleaned(monkeypatch):
+    """PowerShell 5.1 can prepend a byte order mark and append a newline when it pipes a key."""
+    seen = []
+
+    def handler(request):
+        seen.append(request.headers["X-API-Key"])
+        return httpx.Response(200, json={"results": [{"url": "http://x.test", "text": "<body>ok</body>"}], "errors": []})
+
+    monkeypatch.setenv("TINYFISH_API_KEY", "\ufefftf_example_key\r\n")
+    await gateway_with(handler, key=None).fetch_page("http://x.test")
+    assert seen == ["tf_example_key"]
+
+
+@pytest.mark.parametrize("bad", ["tf_exa mple", "tf_example_k\u00e9y"])
+async def test_malformed_key_fails_clearly_without_echoing_it(monkeypatch, bad):
+    monkeypatch.setenv("TINYFISH_API_KEY", bad)
+    with pytest.raises(MalformedApiKeyError) as caught:
+        await gateway_with(lambda request: httpx.Response(200, json={}), key=None).fetch_page("http://x.test")
+    assert "MALFORMED_API_KEY" in str(caught.value) and bad not in str(caught.value)
 
 
 @pytest.mark.parametrize("status, code", [(401, "INVALID_API_KEY"), (402, "INSUFFICIENT_CREDITS"), (403, "FORBIDDEN")])

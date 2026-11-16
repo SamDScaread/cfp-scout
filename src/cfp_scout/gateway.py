@@ -9,7 +9,7 @@ from typing import Any
 
 import httpx
 
-from .errors import AgentRunError, MissingApiKeyError, PageFetchError, TinyFishApiError
+from .errors import AgentRunError, MalformedApiKeyError, MissingApiKeyError, PageFetchError, TinyFishApiError
 
 FETCH_URL = "https://api.fetch.tinyfish.ai"
 SEARCH_URL = "https://api.search.tinyfish.ai"
@@ -46,6 +46,15 @@ class CreatedMonitor:
     baseline_text: str
 
 
+def _clean_key(value: str) -> str:
+    """Drop surrounding whitespace and byte order marks.
+
+    Windows PowerShell 5.1 can add a UTF-8 byte order mark when it pipes text to another
+    program, which is how a stray BOM reached a GitHub secret during testing.
+    """
+    return value.strip().strip("\ufeff").strip()
+
+
 class TinyFishGateway:
     """Reads TINYFISH_API_KEY when a call is made, so the server can start and list tools without it."""
 
@@ -63,11 +72,17 @@ class TinyFishGateway:
         await self._client.aclose()
 
     def _headers(self) -> dict[str, str]:
-        key = self._api_key or os.environ.get("TINYFISH_API_KEY", "").strip()
+        key = _clean_key(self._api_key or os.environ.get("TINYFISH_API_KEY", ""))
         if not key:
             raise MissingApiKeyError(
                 "TINYFISH_API_KEY is not set.",
                 hint="Create a key at https://agent.tinyfish.ai/api-keys and set it in the MCP client's env config.",
+            )
+        if not key.isascii() or any(char.isspace() for char in key):
+            # Never echo the key: say what is wrong with it, not what it is.
+            raise MalformedApiKeyError(
+                "TINYFISH_API_KEY contains spaces or characters an API key cannot have.",
+                hint="Set it again from a plain copy of the key, without quotes.",
             )
         return {"X-API-Key": key}
 

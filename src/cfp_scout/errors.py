@@ -33,6 +33,10 @@ class MissingApiKeyError(CfpScoutError):
     code = "MISSING_API_KEY"
 
 
+class MalformedApiKeyError(MissingApiKeyError):
+    code = "MALFORMED_API_KEY"
+
+
 class TinyFishApiError(CfpScoutError):
     """TinyFish rejected or failed the request (auth, wallet, rate limit, outage)."""
 
